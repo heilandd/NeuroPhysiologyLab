@@ -272,3 +272,320 @@ plotCells=function(object, cell.keep, show.connections=T){
 }
 
 
+
+#' @title plotVectorfield
+#' @author Dieter Henrik Heiland
+#' @description plotVectorfield
+#' @inherit 
+#' @return 
+#' @examples 
+#' 
+#' @export
+#' 
+#'
+
+plotVectorfield <- function(object, real=F){
+  
+  neighbour <- object@Connections$poly_connected
+  
+  #Re-define parameters
+  
+  NN.file <- data.frame(sample= "Test",
+                        bc_origin=paste0("cell_", object@Connections$poly_connected$cells),
+                        bc_destination=paste0("cell_", object@Connections$poly_connected$To),
+                        xo=object@Connections$poly_connected$x1,
+                        yo=object@Connections$poly_connected$y1,
+                        xd=object@Connections$poly_connected$x2,    
+                        yd=object@Connections$poly_connected$y2, 
+                        distance=object@Connections$poly_connected$dist) %>% as_tibble()
+  
+  
+  df <- data.frame(barcodes=NN.file$bc_origin %>% unique()) %>% 
+    mutate(x=purrr::map(.x=barcodes, function(x){NN.file %>% filter(bc_origin==x) %>% head(., 1) %>% pull(xo)} )%>% unlist(),
+           y=purrr::map(.x=barcodes, function(x){NN.file %>% filter(bc_origin==x) %>% head(., 1) %>% pull(yo)})%>% unlist(),
+           feat=purrr::map(.x=barcodes, function(x){neighbour %>% mutate(cells=paste0("cell_", cells)) %>% filter(cells==x) %>% pull(To) %>% unique() %>% length() }) %>% unlist() %>% as.numeric()
+    )
+  
+  
+  parameter="feat"
+  
+  message(" Create Vectorfield ")
+  
+  VF <- NeuroPhysiologyLab::getVectorfields(df,NN.file,parameter) %>% dplyr::select(x,y,{{parameter}}, t.x, t.y) %>% rename("parameter":=!!sym(parameter))
+  
+  if(real==T){
+    
+    image_raster <- object@Image_real %>% scales::rescale(c(0,1))
+    #image_raster[!is.na(object@Image)]<-0.5
+    image_raster <- grDevices::as.raster(x = image_raster)
+    
+    img_info <-
+      image_raster %>%
+      magick::image_read() %>%
+      magick::image_info()
+    
+    st_image <-
+      image_raster %>%
+      magick::image_read() %>% 
+      magick::image_rotate(90) %>% 
+      magick::image_flop() %>% 
+      magick::image_flip() %>% 
+      magick::image_negate()
+    
+    #graphics::image(object@Image)
+    
+    
+  }else{
+    
+    image_raster <- object@Image
+    image_raster[!is.na(object@Image)]<-0.5
+    image_raster <- grDevices::as.raster(x = image_raster)
+    
+    img_info <-
+      image_raster %>%
+      magick::image_read() %>%
+      magick::image_info()
+    
+    st_image <-
+      image_raster %>%
+      magick::image_read() %>% 
+      magick::image_rotate(90) %>% 
+      magick::image_flop() %>% 
+      magick::image_flip() %>% 
+      magick::image_negate()
+    
+    #graphics::image(object@Image)
+    
+    
+  }
+  
+  
+  
+  ggplot(data=VF, aes(x,y))+
+    ggplot2::annotation_raster(raster = st_image,
+                               xmin = 0, ymin = 0,
+                               xmax = 1,
+                               ymax = 1)+
+    
+    geom_point(data=VF , mapping=aes(x,y), size=0.2, alpha=0.5)+
+    theme_classic()+
+    metR::geom_vector(aes(dx = t.x, dy = t.y)) +
+    metR::scale_mag()
+  
+  
+  
+}
+
+#' @title plotVectorfield
+#' @author Dieter Henrik Heiland
+#' @description plotVectorfield
+#' @inherit 
+#' @return 
+#' @examples 
+#' 
+#' @export
+#' 
+#'
+
+plotVectorStream <- function(object, pt.size=1, pt.alpha=0.5, size.arrow=1, alpha.arrow=0.5, real=F){
+  
+  neighbour <- object@Connections$poly_connected
+  
+  #Re-define parameters
+  
+  NN.file <- data.frame(sample= "Test",
+                        bc_origin=paste0("cell_", object@Connections$poly_connected$cells),
+                        bc_destination=paste0("cell_", object@Connections$poly_connected$To),
+                        xo=object@Connections$poly_connected$x1,
+                        yo=object@Connections$poly_connected$y1,
+                        xd=object@Connections$poly_connected$x2,    
+                        yd=object@Connections$poly_connected$y2, 
+                        distance=object@Connections$poly_connected$dist) %>% as_tibble()
+  
+  
+  df <- data.frame(barcodes=NN.file$bc_origin %>% unique()) %>% 
+    mutate(x=purrr::map(.x=barcodes, function(x){NN.file %>% filter(bc_origin==x) %>% head(., 1) %>% pull(xo)} )%>% unlist(),
+           y=purrr::map(.x=barcodes, function(x){NN.file %>% filter(bc_origin==x) %>% head(., 1) %>% pull(yo)})%>% unlist(),
+           feat=purrr::map(.x=barcodes, function(x){neighbour %>% mutate(cells=paste0("cell_", cells)) %>% filter(cells==x) %>% pull(To) %>% unique() %>% length() }) %>% unlist() %>% as.numeric()
+    )
+  
+  
+  parameter="feat"
+  
+  message(" Create Vectorfield ")
+  
+  VF <- NeuroPhysiologyLab::getVectorfields(df,NN.file,parameter) %>% dplyr::select(x,y,{{parameter}}, t.x, t.y) %>% rename("parameter":=!!sym(parameter))
+  
+  
+  if(real==T){
+    
+    image_raster <- object@Image_real %>% scales::rescale(c(0,1))
+    #image_raster[!is.na(object@Image)]<-0.5
+    image_raster <- grDevices::as.raster(x = image_raster)
+    
+    img_info <-
+      image_raster %>%
+      magick::image_read() %>%
+      magick::image_info()
+    
+    st_image <-
+      image_raster %>%
+      magick::image_read() %>% 
+      magick::image_rotate(90) %>% 
+      magick::image_flop() %>% 
+      magick::image_flip() %>% 
+      magick::image_negate()
+    
+    #graphics::image(object@Image)
+    
+    
+  }else{
+    
+    image_raster <- object@Image
+    image_raster[!is.na(object@Image)]<-0.5
+    image_raster <- grDevices::as.raster(x = image_raster)
+    
+    img_info <-
+      image_raster %>%
+      magick::image_read() %>%
+      magick::image_info()
+    
+    st_image <-
+      image_raster %>%
+      magick::image_read() %>% 
+      magick::image_rotate(90) %>% 
+      magick::image_flop() %>% 
+      magick::image_flip() %>% 
+      magick::image_negate()
+    
+    #graphics::image(object@Image)
+    
+    
+  }
+  
+  
+  
+
+# Create Streams ----------------------------------------------------------
+
+  drifter.split.sf = VF %>% 
+    sf::st_as_sf(coords = c("x", "y"))
+  
+  
+  drifter.grid = drifter.split.sf %>% 
+    sf::st_make_grid(n = c(70,60))%>%
+    sf::st_sf()
+  
+  drifter.split.sf.se = drifter.split.sf%>% filter(parameter!=0)
+  
+  drifter.gridded = drifter.grid %>% 
+    mutate(id = 1:n(), contained = lapply(sf::st_contains(sf::st_sf(geometry),drifter.split.sf.se),identity),
+           obs = sapply(contained, length),
+           u = sapply(contained, function(x) {median(drifter.split.sf.se[x,]$t.x, na.rm = TRUE)}),
+           v = sapply(contained, function(x) {median(drifter.split.sf.se[x,]$t.y, na.rm = TRUE)})) 
+  
+  
+  
+  drifter.gridded = drifter.gridded %>% dplyr::select(obs, u, v) %>% na.omit()
+  
+  ## obtain the centroid coordinates from the grid as table
+  coordinates = drifter.gridded %>% 
+    sf::st_centroid() %>% 
+    sf::st_coordinates() %>% 
+    as_tibble() %>% 
+    rename(x = X, y = Y)
+  
+  ## remove the geometry from the simple feature of gridded drifter dataset
+  sf::st_geometry(drifter.gridded) = NULL
+  
+  ## stitch together the extracted coordinates and drifter information int a single table for SE monsoon season
+  current.gridded.se = coordinates %>% 
+    dplyr::bind_cols(drifter.gridded) %>% 
+    dplyr::mutate(season = "SE")
+  
+  ## bind the gridded table for SE and NE
+  ## Note that similar NE follow similar procedure, hence not shown in the post
+  drifter.current.gridded = current.gridded.se %>% 
+    dplyr::bind_rows(current.gridded.se)
+  
+  
+  
+  
+  ## select grids for SE season only
+  drf.se = drifter.current.gridded %>% filter(season == "SE")
+  
+  ## interpolate the U component
+  u.se = oce::interpBarnes(x = drf.se$x, y = drf.se$y, z = drf.se$u, gamma=0.5)
+  
+  ## obtain dimension that determine the width (ncol) and length (nrow) for tranforming wide into long format table
+  dimension = data.frame(lon = u.se$xg, u.se$zg) %>% dim()
+  
+  ## make a U component data table from interpolated matrix
+  u.tb = data.frame(lon = u.se$xg, 
+                    u.se$zg) %>% 
+    gather(key = "lata", value = "u", 2:dimension[2]) %>% 
+    mutate(lat = rep(u.se$yg, each = dimension[1])) %>% 
+    dplyr::select(lon,lat, u) %>% as.tibble()
+  
+  ## interpolate the V component
+  v.se = oce::interpBarnes(x = drf.se$x, 
+                           y = drf.se$y, 
+                           z = drf.se$v,
+                           gamma=0.5)
+  
+  ## make the V component data table from interpolated matrix
+  v.tb = data.frame(lon = v.se$xg, v.se$zg) %>% 
+    gather(key = "lata", value = "v", 2:dimension[2]) %>% 
+    mutate(lat = rep(v.se$yg, each = dimension[1])) %>% 
+    dplyr::select(lon,lat, v) %>% 
+    as.tibble()
+  
+  ## stitch now the V component intot the U data table and compute the velocity
+  uv.se = u.tb %>% 
+    bind_cols(v.tb %>% dplyr::select(v)) %>% 
+    mutate(vel = sqrt(u^2+v^2))
+  
+  library(oce)
+  
+  if(VF$parameter %>% class()=="factor"){
+    ggplot() +
+      geom_point(data=VF, mapping=aes(x,y, color=parameter), size=pt.size, alpha=pt.alpha)+
+      ggplot2::annotation_raster(raster = st_image,
+                                 xmin = 0, ymin = 0,
+                                 xmax = 1,
+                                 ymax = 1)+
+      metR::geom_streamline(data = uv.se, 
+                            aes(x = lon, y = lat, dx = u, dy = v),
+                            size=size.arrow,
+                            alpha=alpha.arrow,
+                            arrow.length = 0.5,
+                            arrow.angle = 25,
+                            arrow.type = "closed",
+                            L = 3, res =0.5,
+                            lineend = "round")+
+      theme_void()
+  }else{
+    ggplot() +
+      geom_point(data=VF, mapping=aes(x,y, color=parameter), size=pt.size, alpha=pt.alpha)+
+      ggplot2::annotation_raster(raster = st_image,
+                                 xmin = 0, ymin = 0,
+                                 xmax = 1,
+                                 ymax = 1)+
+      scale_color_viridis_c(guide = "none") +
+      metR::geom_streamline(data = uv.se, 
+                            aes(x = lon, y = lat, dx = u, dy = v),
+                            alpha=alpha.arrow,
+                            size=size.arrow,
+                            arrow.length = 0.5,
+                            arrow.angle = 25,
+                            arrow.type = "closed",
+                            L = 3, 
+                            res =0.5,
+                            lineend = "round")+
+      theme_void()
+  }
+  
+  
+  
+}
+

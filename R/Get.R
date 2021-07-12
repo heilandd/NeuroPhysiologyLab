@@ -39,3 +39,91 @@ getDistance=function(p1x,p1y, p2x,p2y){
   dist_out=sqrt( (abs(p2x-p1x)^2) + (abs(p2y-p1y)^2)    )
   return(dist_out)
 }
+
+
+#' @title getVectorfields
+#' @author Dieter Henrik Heiland
+#' @description getVectorfields
+#' @inherit 
+#' @return 
+#' @examples 
+#' 
+#' @export
+#' 
+#'
+
+getVectorfields<-function(df,NN.file,parameter, Ram.free=50000, workers=8, dist.spot=0.01){
+  
+
+# Set up multiocore -------------------------------------------------------
+
+  
+  base::options(future.fork.enable = TRUE)
+  future::plan("multiprocess", workers = workers)
+  future::supportsMulticore()
+  base::options(future.globals.maxSize = Ram.free * 1024^2)
+  base::message("... Run multicore ... ")
+
+
+# Create Vectorfields -----------------------------------------------------
+
+
+  VF <- furrr::future_map(.x=1:nrow(df), .f=function(i){
+    
+    bc <- df[i, c("barcodes")]
+    cc <- df[i, c("x", "y")]
+    
+    #NN <- NN.file %>% filter(bc_origin=={{bc}}) %>% pull(bc_destination)
+    
+    NN <- NN.file %>% 
+      filter(xo < cc$x+dist.spot & xo > cc$x-dist.spot) %>% 
+      filter(yo < cc$y+dist.spot & yo > cc$y-dist.spot) %>%
+      pull(bc_destination)
+    
+    
+    NN.df <- df %>% filter(barcodes %in% NN) %>% as.data.frame()
+    
+    
+    
+    # create vector
+    V <- -c(
+      as.numeric(cc) - c(NN.df$x[which.max(NN.df[,parameter])], NN.df$y[which.max(NN.df[,parameter])])
+    )
+    
+    
+    
+    #V <- c(NN$x[which.max(NN$z)], NN$y[which.max(NN$z)]) * cor[i, c("z")]
+    if(length(V)==0){
+      out <- data.frame(barcodes=bc, t.x=0, t.y=0)
+    }else{out <- data.frame(barcodes=bc, t.x=V[1], t.y=V[2])}
+    
+    
+    return(out)
+    
+    
+    
+  }, .progress = T) %>% 
+    do.call(rbind, .) %>% 
+    as.data.frame() %>% 
+    left_join(., df, by="barcodes")
+  
+  VF[is.na(VF)] <- 0
+  
+  return(VF)
+  
+  
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

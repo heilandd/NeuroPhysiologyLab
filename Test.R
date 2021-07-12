@@ -66,6 +66,10 @@ plotCells(object, cell.keep = cells.df)
 
 
 
+plotVectorStream(object,alpha.arrow=0.1)
+
+plotVectorfield(object)
+
 
 
 
