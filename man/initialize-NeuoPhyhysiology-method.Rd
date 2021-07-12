@@ -4,7 +4,7 @@
 \alias{initialize,NeuoPhyhysiology-method}
 \title{Initicate NeuoPhyhysiology object}
 \usage{
-\S4method{initialize}{NeuoPhyhysiology}(.Object, Data.character)
+\S4method{initialize}{NeuoPhyhysiology}(.Object)
 }
 \arguments{
 \item{Data.character}{A valid Data.character list}

@@ -10,10 +10,13 @@
 #'
 
 
-readFluoroSNNAP <- function(object, path){
+readFluoroSNNAP <- function(path){
   
-  if(object %>% class()!="NeuoPhyhysiology") stop("object is not from class NeuoPhyhysiology ") else{ message("valid input object from class: NeuoPhyhysiology")}
+  #if(object %>% class()!="NeuoPhyhysiology") stop("object is not from class NeuoPhyhysiology ") else{ message("valid input object from class: NeuoPhyhysiology")}
   if(file.exists(path)==F) stop("Input mat file do not exist or the path is wrong")
+  
+  #Create object
+  object <- new(NeuroPhysiologyLab::.__C__NeuoPhyhysiology)
   
   #Read in data
   Ca_Set=R.matlab::readMat(path)

@@ -4,7 +4,7 @@
 \alias{readFluoroSNNAP}
 \title{readFluoroSNNAP}
 \usage{
-readFluoroSNNAP(object, path)
+readFluoroSNNAP(path)
 }
 \value{
 

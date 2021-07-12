@@ -1,13 +1,5 @@
-library(NeuroPhysiologyLab)x
+library(NeuroPhysiologyLab)
 library(tidyverse)
-
-Data.character=list(ExpID="Ca_imimaging_test", 
-                    Researcher="KJ", 
-                    Bioinformatic="Dieter Henri Heiland",
-                    Institute="MILO Laboratory",
-                    Date_of_Analysis="04.02.2020",
-                    Datatype="Ca-Imaging",
-                    Species="Human")
 
 path="/Users/HenrikHeiland/Desktop/Projekt_Metabolom/Bioinformatic\ Tests/NeuroPhysiology_Lab/analysis_test.mat"
 path="#372_B1_crop2_processed_analysis.mat"
@@ -20,9 +12,8 @@ path="analysis_test.mat"
 setwd("~/Downloads/GlioGly files/Calcium Imaging Data/233 KO and WT cells/mat files")
 path="analysis-A1_8bit_crop1.mat"
 
+object <- NeuroPhysiologyLab::readFluoroSNNAP(path)
 
-object <- NeuroPhysiologyLab::NeuoPhyhysiology(Data.character=Data.character)
-object <- NeuroPhysiologyLab::readFluoroSNNAP(object, path)
 
 object <- NeuroPhysiologyLab::findConnections(object, pal=viridis::viridis(50))
 

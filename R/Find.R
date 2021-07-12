@@ -297,9 +297,9 @@ findCellFrequency <- function(object, min.events=5){
 
 
 
-#' @title FindPeacemaker
+#' @title FindPacemaker
 #' @author Dieter Henrik Heiland
-#' @description FindPeacemaker
+#' @description FindPacemaker
 #' @inherit 
 #' @return 
 #' @examples 
@@ -308,7 +308,7 @@ findCellFrequency <- function(object, min.events=5){
 #' 
 #'
 
-FindPeacemaker <- function(object, min.sd=15, verbose=F ){
+FindPacemaker <- function(object, min.sd=15, verbose=F ){
   
   frequence <- object@Connections$Frequence
   
@@ -330,10 +330,10 @@ FindPeacemaker <- function(object, min.sd=15, verbose=F ){
   selected.frequence <- rlist::list.clean(selected.frequence)
   
   #message
-  message("With the curent parameters, ", length(selected.frequence), " Peacmaker cells were observed")
+  message("With the curent parameters, ", length(selected.frequence), " Pacemaker cells were observed")
   
   
-  object@Connections$Peacmaker <- selected.frequence
+  object@Connections$Pacemaker <- selected.frequence
   }
   if(length(min.sd)>1){
     
@@ -354,13 +354,13 @@ FindPeacemaker <- function(object, min.sd=15, verbose=F ){
       selected.frequence <- rlist::list.clean(selected.frequence)
       
       #message
-      message("With the curent parameters, ", length(selected.frequence), " Peacmaker cells were observed")
+      message("With the curent parameters, ", length(selected.frequence), " Pacemaker cells were observed")
       
       return(selected.frequence)
       
     })
   
-  object@Connections$Peacmaker <- multi.freq
+  object@Connections$Pacemaker <- multi.freq
  
   }
   
