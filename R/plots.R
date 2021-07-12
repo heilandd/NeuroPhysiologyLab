@@ -170,7 +170,7 @@ plotSFT <- function(object){
 
 plotFreq <- function(object){
   
-  freq <- object@Connections$SFT$frequence
+  frq <- object@Connections$SFT$frequence
   plot.df <- data.frame(x=1:nrow(frq), 
                         y=frq[order(frq$Freq, decreasing = T), ]$Freq)
   
