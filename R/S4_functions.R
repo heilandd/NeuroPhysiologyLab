@@ -16,6 +16,7 @@ setMethod("initialize",signature = "NeuoPhyhysiology", definition = function(.Ob
   return(.Object)
 })
 
+
 #' @export
 setMethod(f = "show", signature = "NeuoPhyhysiology", definition = function(object){
   
