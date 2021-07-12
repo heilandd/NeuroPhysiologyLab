@@ -27,3 +27,38 @@ setMethod(f = "show", signature = "NeuoPhyhysiology", definition = function(obje
 })
 
 
+# Generics ----------------------------------------------------------------
+
+#' @title Generics to extract a slots content
+#'
+#' @param object A valid spata-object.
+#' @param of_sample The sample from which to extract the content.
+#'
+#' @return The respective slots content.
+#' @export
+#'
+#'
+setGeneric(name = "traces", def = function(object){
+  
+  standardGeneric(f = "traces")
+  
+})
+
+
+
+# Methods -----------------------------------------------------------------
+
+#' @title Methods
+
+#' @param object A valid spata-object.
+#' @param of_sample The sample from which to extract the content.
+#'
+#' @export
+#'
+
+setMethod(f = "traces", signature = "NeuoPhyhysiology", definition = function(object){
+  
+  return(object@Traces)
+  
+})
+

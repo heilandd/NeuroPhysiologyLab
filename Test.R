@@ -16,7 +16,6 @@ object <- NeuroPhysiologyLab::readFluoroSNNAP(path)
 
 
 object <- NeuroPhysiologyLab::findConnections(object, pal=viridis::viridis(50))
-
 NeuroPhysiologyLab::plotConnections(object, lwd = 1)
 
 
