@@ -51,7 +51,7 @@ runSFT <- function(object, breaks=1000){
   frq$connectivity=frq$Freq/max(frq$Freq)
   a=hist(frq$connectivity, breaks = breaks, plot=F)
   
-  SFT <- list(frq, a, m, Rsqrt)
+  SFT <- list(frq, a)
   names(SFT) <- c("frequence", "histo")
   object@Connections$SFT <- SFT
   
