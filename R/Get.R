@@ -116,8 +116,30 @@ getVectorfields<-function(df,NN.file,parameter, Ram.free=50000, workers=8, dist.
 
 
 
+#' @title getSFT.R2
+#' @author Dieter Henrik Heiland
+#' @description getSFT.R2
+#' @inherit 
+#' @return 
+#' @examples 
+#' 
+#' @export
+#' 
+#'
+getSFT.R2 <- function(object){return(object@Connections$SFT$R2)}
 
 
+#' @title getSFT.R2
+#' @author Dieter Henrik Heiland
+#' @description getSFT.R2
+#' @inherit 
+#' @return 
+#' @examples 
+#' 
+#' @export
+#' 
+#'
+getFeatures <- function(object){return(object@scDisctiption)}
 
 
 

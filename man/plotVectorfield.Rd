@@ -4,7 +4,7 @@
 \alias{plotVectorfield}
 \title{plotVectorfield}
 \usage{
-plotVectorfield(object, real = F)
+plotVectorfield(object, real = F, dist.spot = 0.01)
 }
 \value{
 

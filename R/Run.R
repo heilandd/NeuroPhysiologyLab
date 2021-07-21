@@ -55,6 +55,18 @@ runSFT <- function(object, breaks=1000){
   names(SFT) <- c("frequence", "histo")
   object@Connections$SFT <- SFT
   
+  
+  plot.df <- data.frame(x=log10(object@Connections$SFT$histo$counts), 
+                        y=log10(object@Connections$SFT$histo$mids)) %>% 
+    filter(is.finite(x))
+  
+  m=lm(plot.df$y~plot.df$x)
+  Rsqrt=summary(m)$adj.r.squared
+  print(paste0("R2 is: ", Rsqrt))
+  object@Connections$SFT$R2 <-  Rsqrt
+  
+  
+  
   return(object)
 }
 

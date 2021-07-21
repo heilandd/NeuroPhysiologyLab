@@ -142,11 +142,6 @@ plotSFT <- function(object){
                         y=log10(object@Connections$SFT$histo$mids)) %>% 
     filter(is.finite(x))
   
-  m=lm(plot.df$y~plot.df$x)
-  Rsqrt=summary(m)$adj.r.squared
-  print(paste0("R2 is: ", Rsqrt))
-  object@Connections$SFT$R2 <<- Rsqrt
-  
   ggplot2::ggplot(plot.df, aes(x,y))+
     ggplot2::geom_point()+
     ggplot2::theme_classic()+
@@ -284,7 +279,7 @@ plotCells=function(object, cell.keep, show.connections=T){
 #' 
 #'
 
-plotVectorfield <- function(object, real=F){
+plotVectorfield <- function(object, real=F,dist.spot=0.01){
   
   neighbour <- object@Connections$poly_connected
   
@@ -311,7 +306,7 @@ plotVectorfield <- function(object, real=F){
   
   message(" Create Vectorfield ")
   
-  VF <- NeuroPhysiologyLab::getVectorfields(df,NN.file,parameter) %>% dplyr::select(x,y,{{parameter}}, t.x, t.y) %>% rename("parameter":=!!sym(parameter))
+  VF <- NeuroPhysiologyLab::getVectorfields(df,NN.file,parameter,dist.spot=dist.spot) %>% dplyr::select(x,y,{{parameter}}, t.x, t.y) %>% rename("parameter":=!!sym(parameter))
   
   if(real==T){
     
@@ -387,7 +382,7 @@ plotVectorfield <- function(object, real=F){
 #' 
 #'
 
-plotVectorStream <- function(object, pt.size=1, pt.alpha=0.5, size.arrow=1, alpha.arrow=0.5, real=F){
+plotVectorStream <- function(object, pt.size=1, pt.alpha=0.5, size.arrow=1, alpha.arrow=0.5, real=F,dist.spot=0.01){
   
   neighbour <- object@Connections$poly_connected
   
@@ -414,7 +409,7 @@ plotVectorStream <- function(object, pt.size=1, pt.alpha=0.5, size.arrow=1, alph
   
   message(" Create Vectorfield ")
   
-  VF <- NeuroPhysiologyLab::getVectorfields(df,NN.file,parameter) %>% dplyr::select(x,y,{{parameter}}, t.x, t.y) %>% rename("parameter":=!!sym(parameter))
+  VF <- NeuroPhysiologyLab::getVectorfields(df,NN.file,parameter,dist.spot=dist.spot) %>% dplyr::select(x,y,{{parameter}}, t.x, t.y) %>% rename("parameter":=!!sym(parameter))
   
   
   if(real==T){

@@ -10,7 +10,8 @@ plotVectorStream(
   pt.alpha = 0.5,
   size.arrow = 1,
   alpha.arrow = 0.5,
-  real = F
+  real = F,
+  dist.spot = 0.01
 )
 }
 \value{

@@ -4,7 +4,7 @@
 \alias{findPacemaker}
 \title{FindPacemaker}
 \usage{
-findPacemaker(object, min.sd = 15, verbose = F)
+findPacemaker(object, min.sd = 15, verbose = T)
 }
 \value{
 

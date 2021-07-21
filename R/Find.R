@@ -308,7 +308,7 @@ findCellFrequency <- function(object, min.events=5){
 #' 
 #'
 
-findPacemaker <- function(object, min.sd=15, verbose=F ){
+findPacemaker <- function(object, min.sd=15, verbose=T ){
   
   frequence <- object@Connections$Frequence
   
