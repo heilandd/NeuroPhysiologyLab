@@ -194,7 +194,8 @@ plotCells(object, cell.keep = cells.df)
 
 
 
-
+# Render Totorials
+rmarkdown::render("~/Desktop/Neurophysiology.Rmd")
 
 
 

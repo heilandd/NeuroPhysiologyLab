@@ -240,7 +240,13 @@ plotHotspots=function(object,
 #' @export
 #' 
 #'
-plotCells=function(object, cell.keep, show.connections=T,pt.size=3, color="red", lt.size=0.1){
+plotCells=function(object, 
+                   cell.keep,
+                   show.connections=T,
+                   pt.size=3, 
+                   color="red", 
+                   real=F,
+                   lt.size=0.1){
   
   plot_image_file <- object@Image
   poly_connected <- object@Connections$poly_connected
@@ -251,24 +257,73 @@ plotCells=function(object, cell.keep, show.connections=T,pt.size=3, color="red",
   #image_raster[!is.na(object@Image)]<-0.5
   image_raster <- grDevices::as.raster(x = image_raster)
   
-  img_info <-
-    image_raster %>%
-    magick::image_read() %>%
-    magick::image_info()
   
-  st_image <-
-    image_raster %>%
-    magick::image_read() %>% 
-    magick::image_rotate(90) %>% 
-    magick::image_flop() %>% 
-    magick::image_flip() %>% 
-    magick::image_negate()
+  
+  if(real==T){
+    
+    image_raster <- object@Image_real %>% scales::rescale(c(0,1))
+    #image_raster[!is.na(object@Image)]<-0.5
+    image_raster <- grDevices::as.raster(x = image_raster)
+    
+    img_info <-
+      image_raster %>%
+      magick::image_read() %>%
+      magick::image_info()
+    
+    st_image <-
+      image_raster %>%
+      magick::image_read() %>% 
+      magick::image_rotate(90) %>% 
+      magick::image_flop() %>% 
+      magick::image_flip() %>% 
+      magick::image_negate()
+    
+    #graphics::image(object@Image)
+    
+    
+  }else{
+    
+    image_raster <- object@Image
+    image_raster[!is.na(object@Image)]<-0.5
+    image_raster <- grDevices::as.raster(x = image_raster)
+    
+    img_info <-
+      image_raster %>%
+      magick::image_read() %>%
+      magick::image_info()
+    
+    st_image <-
+      image_raster %>%
+      magick::image_read() %>% 
+      magick::image_rotate(90) %>% 
+      magick::image_flop() %>% 
+      magick::image_flip() %>% 
+      magick::image_negate()
+    
+    #graphics::image(object@Image)
+    
+    
+  }
+  
   
   p <- ggplot()
-  p=p+ggplot2::annotation_raster(raster = st_image,
-                                 xmin = 0, ymin = 0,
-                                 xmax = 1,
-                                 ymax = 1)
+  
+  
+  if(real==T){
+    p=p+ggplot2::annotation_raster(raster = st_image,
+                                   xmin = 0, ymin = 0,
+                                   xmax = 1,
+                                   ymax = 1)
+  }else{
+    p=p+ggplot2::annotation_raster(raster = st_image,
+                                   xmin = 0, ymin = 0,
+                                   xmax = 1,
+                                   ymax = 1)
+  }
+  
+  
+  
+ 
   
   if(show.connections==T){
     p=p+ggplot2::geom_segment(data=poly_connected, mapping=aes(x=x1, xend=x2, y=y1, yend=y2), size=lt.size)
@@ -401,7 +456,17 @@ plotVectorfield <- function(object, real=F,dist.spot=0.01){
 #' 
 #'
 
-plotVectorStream <- function(object, pt.size=1, pt.alpha=0.5, size.arrow=1, alpha.arrow=0.5, real=F,dist.spot=0.01){
+plotVectorStream <- function(object, 
+                             pt.size=1, 
+                             pt.alpha=0.5, 
+                             size.arrow=1, 
+                             alpha.arrow=0.5, 
+                             real=F,
+                             dist.spot=0.01,
+                             L=40,
+                             res=0.5,
+                             grid=c(40,40),
+                             skip=2){
   
   neighbour <- object@Connections$poly_connected
   
@@ -487,7 +552,7 @@ plotVectorStream <- function(object, pt.size=1, pt.alpha=0.5, size.arrow=1, alph
   
   
   drifter.grid = drifter.split.sf %>% 
-    sf::st_make_grid(n = c(70,60))%>%
+    sf::st_make_grid(n = grid)%>%
     sf::st_sf()
   
   drifter.split.sf.se = drifter.split.sf%>% filter(parameter!=0)
@@ -562,12 +627,12 @@ plotVectorStream <- function(object, pt.size=1, pt.alpha=0.5, size.arrow=1, alph
   library(oce)
   
   if(VF$parameter %>% class()=="factor"){
-    ggplot() +
-      geom_point(data=VF, mapping=aes(x,y, color=parameter), size=pt.size, alpha=pt.alpha)+
+    ggplot2::ggplot() +
       ggplot2::annotation_raster(raster = st_image,
                                  xmin = 0, ymin = 0,
                                  xmax = 1,
                                  ymax = 1)+
+      ggplot2::geom_point(data=VF, mapping=aes(x,y, color=parameter), size=pt.size, alpha=pt.alpha)+
       metR::geom_streamline(data = uv.se, 
                             aes(x = lon, y = lat, dx = u, dy = v),
                             size=size.arrow,
@@ -575,17 +640,17 @@ plotVectorStream <- function(object, pt.size=1, pt.alpha=0.5, size.arrow=1, alph
                             arrow.length = 0.5,
                             arrow.angle = 25,
                             arrow.type = "closed",
-                            L = 3, res =0.5,
+                            L = L, res =res,skip=skip,
                             lineend = "round")+
       theme_void()
   }else{
     ggplot() +
-      geom_point(data=VF, mapping=aes(x,y, color=parameter), size=pt.size, alpha=pt.alpha)+
       ggplot2::annotation_raster(raster = st_image,
                                  xmin = 0, ymin = 0,
                                  xmax = 1,
                                  ymax = 1)+
-      scale_color_viridis_c(guide = "none") +
+      ggplot2::geom_point(data=VF, mapping=aes(x,y, color=parameter), size=pt.size, alpha=pt.alpha)+
+      ggplot2::scale_color_viridis_c(guide = "none") +
       metR::geom_streamline(data = uv.se, 
                             aes(x = lon, y = lat, dx = u, dy = v),
                             alpha=alpha.arrow,
@@ -593,8 +658,7 @@ plotVectorStream <- function(object, pt.size=1, pt.alpha=0.5, size.arrow=1, alph
                             arrow.length = 0.5,
                             arrow.angle = 25,
                             arrow.type = "closed",
-                            L = 3, 
-                            res =0.5,
+                            L = L, res =res,skip=skip,
                             lineend = "round")+
       theme_void()
   }

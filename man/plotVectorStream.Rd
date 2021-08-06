@@ -11,7 +11,11 @@ plotVectorStream(
   size.arrow = 1,
   alpha.arrow = 0.5,
   real = F,
-  dist.spot = 0.01
+  dist.spot = 0.01,
+  L = 40,
+  res = 0.5,
+  grid = c(40, 40),
+  skip = 2
 )
 }
 \value{

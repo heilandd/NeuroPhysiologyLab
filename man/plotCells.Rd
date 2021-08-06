@@ -10,6 +10,7 @@ plotCells(
   show.connections = T,
   pt.size = 3,
   color = "red",
+  real = F,
   lt.size = 0.1
 )
 }
