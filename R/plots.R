@@ -240,29 +240,48 @@ plotHotspots=function(object,
 #' @export
 #' 
 #'
-plotCells=function(object, cell.keep, show.connections=T){
+plotCells=function(object, cell.keep, show.connections=T,pt.size=3, color="red", lt.size=0.1){
   
   plot_image_file <- object@Image
   poly_connected <- object@Connections$poly_connected
-  
   poly_connected <- poly_connected %>% dplyr::filter(cells %in% {{cell.keep}})
   
-
-  graphics::image(plot_image_file, col="lightgray", xaxt="n", yaxt="n")
   
+  image_raster <- object@Image_real %>% scales::rescale(c(0,1))
+  #image_raster[!is.na(object@Image)]<-0.5
+  image_raster <- grDevices::as.raster(x = image_raster)
   
-  graphics::points(x=poly_connected$x1,y=poly_connected$y1, pch=16, col=poly_connected$col, cex=0.5)
-  graphics::points(x=poly_connected$x2,y=poly_connected$y3, pch=16, col=poly_connected$col, cex=0.5)
+  img_info <-
+    image_raster %>%
+    magick::image_read() %>%
+    magick::image_info()
+  
+  st_image <-
+    image_raster %>%
+    magick::image_read() %>% 
+    magick::image_rotate(90) %>% 
+    magick::image_flop() %>% 
+    magick::image_flip() %>% 
+    magick::image_negate()
+  
+  p <- ggplot()
+  p=p+ggplot2::annotation_raster(raster = st_image,
+                                 xmin = 0, ymin = 0,
+                                 xmax = 1,
+                                 ymax = 1)
   
   if(show.connections==T){
-    for(z in 1:nrow(poly_connected)){polygon(x=c(poly_connected$x1[z],poly_connected$x2[z]),
-                                             y=c(poly_connected$y1[z],poly_connected$y2[z]),
-                                             border=alpha(poly_connected$col[z], alpha), 
-                                             lty=1, 
-                                             lwd=lwd[z])} 
-    
+    p=p+ggplot2::geom_segment(data=poly_connected, mapping=aes(x=x1, xend=x2, y=y1, yend=y2), size=lt.size)
   }
+  
+  p=p+ggplot2::geom_point(data=poly_connected, mapping=aes(x=x1, y=y1),color=color, size=pt.size)
+  
+  p=p+theme_void()
 
+  return(p)
+  
+  
+  
   
 }
 

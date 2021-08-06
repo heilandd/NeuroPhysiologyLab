@@ -4,7 +4,14 @@
 \alias{plotCells}
 \title{plotHotspots}
 \usage{
-plotCells(object, cell.keep, show.connections = T)
+plotCells(
+  object,
+  cell.keep,
+  show.connections = T,
+  pt.size = 3,
+  color = "red",
+  lt.size = 0.1
+)
 }
 \value{
 
