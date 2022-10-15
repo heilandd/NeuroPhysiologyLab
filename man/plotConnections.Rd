@@ -10,6 +10,7 @@ plotConnections(
   pal_image = brewer.pal(9, "Reds"),
   alpha_image = 0.8,
   alpha = 1,
+  parameter = "Nr_of_con",
   lwd = log(object@Connections$poly_connected$Time + 1)/100,
   pal = viridis::viridis(50)
 )

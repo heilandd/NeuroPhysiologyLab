@@ -1,6 +1,6 @@
 
 # Create package
-devtools::create('NeuroPhysiologyLab')
+#devtools::create('NeuroPhysiologyLab')
 
 library(devtools)
 setwd("~/Desktop/Projekt_Metabolom/Bioinformatic Tests/NeuroPhysiologyLab")

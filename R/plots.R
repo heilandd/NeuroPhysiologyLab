@@ -105,6 +105,7 @@ plotConnections=function(object,
                           pal_image=brewer.pal(9,"Reds"),
                           alpha_image=0.8,  
                           alpha=1, 
+                          parameter="Nr_of_con",
                           lwd=log(object@Connections$poly_connected$Time+1)/100, 
                           pal=viridis::viridis(50)){
   
@@ -112,6 +113,8 @@ plotConnections=function(object,
   poly_connected <- object@Connections$poly_connected
   if(length(lwd)==1){lwd=rep(lwd, object@Connections$poly_connected %>% nrow())}
 
+  #adopt colors
+  poly_connected$col <-  NeuroPhysiologyLab::map2color(as.numeric(poly_connected[,parameter]), pal=pal)
 
   graphics::image(image, col="lightgray", xaxt="n", yaxt="n")
   
@@ -136,12 +139,19 @@ plotConnections=function(object,
 #' 
 #'
 
-plotSFT <- function(object){
+plotSFT <- function(object, filter = c(-0.5), export_R=F){
   
   plot.df <- data.frame(x=log10(object@Connections$SFT$histo$counts), 
                         y=log10(object@Connections$SFT$histo$mids)) %>% 
     filter(is.finite(x))
   
+  if(!is.na(filter)){
+    plot.df <-  plot.df %>% filter(y>filter)
+  }
+  
+  model <- lm(x~y, data=plot.df)
+  print(paste0("adj.r.squared: ", summary(model)$adj.r.squared))
+    
   ggplot2::ggplot(plot.df, aes(x,y))+
     ggplot2::geom_point()+
     ggplot2::theme_classic()+
@@ -149,6 +159,7 @@ plotSFT <- function(object){
     ggplot2::xlab("Log10(Connectivity)")+
     ggplot2::ylab("Log10(Frequency)")
   
+  if(export_R==T){return(summary(model)$adj.r.squared)}
   
 }
 

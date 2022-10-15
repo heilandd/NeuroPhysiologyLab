@@ -4,7 +4,7 @@
 \alias{plotSFT}
 \title{plotSFT}
 \usage{
-plotSFT(object)
+plotSFT(object, filter = c(-0.5), export_R = F)
 }
 \value{
 
